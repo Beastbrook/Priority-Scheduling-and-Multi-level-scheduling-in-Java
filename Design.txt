@@ -1,0 +1,36 @@
+For Static and Dynamic schedulers, Java's built in PriorityQueue was used. In
+the documentation, it says this class is guaranteed to give us O(log(n)) time
+for enqueing and dequeing. This makes it very efficient over using a linked list
+which would be O(n) time. This descision also made our code much simpler since
+all we needed to do was give it an appropriate comparator and it was able to do
+all of the work of giving us the thread with the lowest priority. The comparator
+has the policy that if one thread has a lower priority value (i.e. is higher
+priority) it is considered 'less than' a thread with a higher one. Also, if 2
+threads have the same priority, it then checks their arrival time in the queue
+to break the tie so that it is round-robin for threads of the same priority.
+(Note that since time is measued in milliseconds, it is possible that a thread
+added after another thread gets to run first because they still have the same
+arrival time)
+
+Another design descision was to keep track of waiting and running times within
+the ThreadState class. This made it simple since each time a thread was
+scheduled or waiting, we automatically had acces to its ThreadState property to
+update it with current information.
+
+For the multilevel scheduler, we used 3 linked lists to serve as the queue. The
+reason we no longer need a PriorityQueue is because the priority now only
+determines which queue to place it in and then it is round robin from there.
+LinkedLists are good for round robin because we can add onto the tail and remove
+from the head (FIFO).
+
+To make testing easy, we defined the TestScheduler interface. It is very simple,
+a class need only implement a test() function. This allows us to specify the
+test we want to run using the configuration file without having to modify
+KThread.selfTest(). This greatly simplified testing since we can now write each
+test in its own class and just specifiy which one we want to run. (Note for a
+test to work correctly, there must be a call to Log.init() at the beginning and
+a call to ThreadedKernel.scheduler.printSystemStats() at the end of it)
+
+The class 'Log' handles getting the name of the logfile to write and deciding
+whether to write to the file or stdout. It also provides the system time for
+use in recording statisics about threads. It is set to 0 in init().
